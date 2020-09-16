@@ -6,7 +6,7 @@ Get a list of available gateways. The info provided of this gateways is the cryp
 ##### Options
 | Option       | Description                                                                                                                                                                                                                                                                                                                                  |
 | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| country      | Defines which gateways are available. By default is automatically detected by the API using client's IP but can be overwriten by providing it's ISO 3166 alpha-2 code (eg: 'us', 'gb'...). To get the a union of the available options for all countries just set the country to 'all'.  `E.g. https://api.onramper.dev/gateways?country=es` |
+| country      | Defines which gateways are available for selected country. By default it is automatically detected by the API using client's IP but it can be overwriten by providing it's ISO 3166 alpha-2 code (eg: 'us', 'gb'...). To get a union of the available options for all countries just set the country to 'all'.  `E.g. https://api.onramper.dev/gateways?country=es` |
 | includeIcons | If `true`, includes icons of the cryptos, currencies and payment methods in the response. `E.g. https://api.onramper.dev/gateways?includeIcons=true`                                                                                                                                                                                         |
 
 ##### Example response
@@ -48,9 +48,9 @@ Get a list of available gateways. The info provided of this gateways is the cryp
 ## Rates
 Endpoint: `https://api.onramper.dev/rate/{fromCurrency}/{toCurrency}/{paymentMethod}/{amount}`  
 
-Get a list of accessable gateways. Those gateways can be availables or unavailables. The available gateways will have the attribute `available` set to `true`, and an [attribute `nextStep`](#steps) describing the first action should be done to start the [purchase flow](#purchase-flow). The unavailable gateways will have the attribute `available` set to `false`, and an attribute `error` describing why is the gateway unavailable (e.g. Maximum amount exceeded).
+Get a list of accessible gateways. Those gateways can be available or unavailable. The available gateways will have the attribute `available` set to `true`, and an [attribute `nextStep`](#steps) describing the first action that should be done to start the [purchase flow](#purchase-flow). The unavailable gateways will have the attribute `available` set to `false`, and an attribute `error` describing why the gateway is unavailable (e.g. Maximum amount exceeded).
 
-Url variables `{fromCurrency}` and `{toCurrency}` should be filled with currency codes and `{paymentMethod}` should be filled with one of the payment methods id's. Codes and id's are availables on the attributes `cryptoCurrencies`, `fiatCurrencies` and `paymentMethods` from [`/gateways` response](#gateways). Url variable {amount} is a positive integer.
+Url variables `{fromCurrency}` and `{toCurrency}` should be filled with currency codes and `{paymentMethod}` should be filled with one of the payment method's id's. Codes and id's are availables on the attributes `cryptoCurrencies`, `fiatCurrencies` and `paymentMethods` from [`/gateways` response](#gateways). Url variable {amount} is a positive integer.
 
 ##### URL
   - **fromCurrency**: Currency we want to pay with, currently only fiat currencies are allowed.
@@ -61,7 +61,7 @@ Url variables `{fromCurrency}` and `{toCurrency}` should be filled with currency
 ##### Options
 | Option         | Description                                                                                                                                                                                                                                                                                                                                  |
 | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| country        | Defines which gateways are available. By default is automatically detected by the API using client's IP but can be overwriten by providing it's ISO 3166 alpha-2 code (eg: 'us', 'gb'...). To get the a union of the available options for all countries just set the country to 'all'.  `E.g. https://api.onramper.dev/gateways?country=es` |
+| country        | Defines which gateways are available. By default country is automatically detected by the API using client's IP but can be overwriten by providing it's ISO 3166 alpha-2 code (eg: 'us', 'gb'...). To get the a union of the available options for all countries just set the country to 'all'.  `E.g. https://api.onramper.dev/gateways?country=es` |
 | includeIcons   | If `true`, includes icons of the cryptos, currencies and payment methods in the response. `E.g. https://api.onramper.dev/gateways?includeIcons=true`                                                                                                                                                                                         |
 | amountInCrypto | If `true`, the amount specified in `{amount}` represents the amount of crypto user wants to buy. `E.g. https://api.onramper.dev/rate/EUR/BTC/creditCard/100?amountInCrypto=true`                                                                                                                                                             |
 
@@ -125,14 +125,14 @@ Url variables `{fromCurrency}` and `{toCurrency}` should be filled with currency
 ```
 
 ## Steps
-The purchase flow is splitted in different steps. User should complete all steps to make a successful purchase. You will find the first step to execute in the attribute `nextStep` of the available gateway selected from the `/rate` response and the following steps in the responses of the steps executed.
+The purchase flow is split in different steps. User should complete all steps to make a successful purchase. You will find the first step to execute in the attribute `nextStep` of the available gateway selected from the `/rate` response and the following steps in the responses of the steps executed.
 
 ##### Purchase flow
 1. First we call to `/gateways` to get a list of the cryptos, currencies and payment methods availables.
 2. Once we have selected the `fromCurrency`, the `toCurrency`, the `paymentMethod` and the `amount` we want to buy, we make a call to `/rates` to know which gateways are availables for that combination.
 3. If the amount is enough to give us at least one gateway available, we can start the process of buying crypto. If not, we should make another call fixing one of the errors described in the attribute `error`.
 4. Now that we have selected the gateway we want to use, we should check the attribute `nextStep` to know which is the first step to start with the purchase flow.
-5. Here you have a ([list of posible steps](#steps)) and instructions to how to execute them.
+5. Here you have a ([list of possible steps](#steps)) and instructions on how to execute them.
 6. Once we complete a step, we will get a new step on the response. We will keep executing steps until the flow is finished.
 
 ![title](images/flow.png)
@@ -142,13 +142,13 @@ The purchase flow is splitted in different steps. User should complete all steps
 
 | Step                   | Description                                                                                                                                                        |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| form                   | Form step. Describes a set of fields that should be filled by the user. To execute make a `POST` request to the `url` attribute with the fields as a body request. |
-| iframe                 | For execute this step, display to the user an iframe if the `url` attribute, listen to 'messages' of the iframe window to get the next step.                       |
+| form                   | Form step. Describes a set of fields that should be filled by the user. To execute, make a `POST` request to the `url` attribute with the fields as a body request. |
+| iframe                 | To execute this step, display to the user an iframe of the `url` attribute, listen to 'messages' of the iframe window to get the next step.                       |
 | redirect               | The user should be redirected to the url specified in the `url` attribute. Listen to 'messages' of the redirected window to get the next step.                     |
 | pickOne                | User can choose to complete one of the steps listed in the `options` attribute.                                                                                    |
 | file                   | User should upload a file. To execute make a `PUT` request to the `url` attribute.                                                                                 |
-| completed              | The purrchase flow is completed. No more steps needed.                                                                                                             |
-| requestBankTransaction | The purrchase flow is completed. User should complete a bank payment.                                                                                              |
+| completed              | The purchase flow is completed. No more steps needed.                                                                                                             |
+| requestBankTransaction | The purchase flow is completed. User should complete a bank payment.                                                                                              |
 
 
 ##### Example response
